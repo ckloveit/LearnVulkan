@@ -1,0 +1,7 @@
+
+[submodule "LearnVulkan/ThirdParty/GLFW"]
+	path = LearnVulkan/ThirdParty/GLFW
+	url = https://github.com/glfw/glfw
+[submodule "LearnVulkan/ThirdParty/GLM"]
+	path = LearnVulkan/ThirdParty/GLM
+	url = https://github.com/Groovounet/glm
