@@ -24,12 +24,33 @@
     <ClCompile Include="Core\LitApp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Core\LitDevice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\LitPipeline.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\LitSwapChain.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\LitWindow.h">
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="Core\LitApp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\LitDevice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\LitPipeline.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\LitSwapChain.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\LitPipelineUtils.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

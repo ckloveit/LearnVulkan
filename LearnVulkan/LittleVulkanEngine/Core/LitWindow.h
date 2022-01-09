@@ -9,15 +9,17 @@ namespace Lit
 	class LitWindow
 	{
 	public:
-		LitWindow(int width, int height, std::string windowName);
+		LitWindow(int InWidth, int InHeight, std::string InWindowName);
 		~LitWindow();
-
 		LitWindow(const LitWindow&) = delete;
-
+		LitWindow& operator=(const LitWindow&) = delete;
 
 		bool ShouldClose() const { return glfwWindowShouldClose(Window); }
 		bool IsWindowResized() const { return bFramebufferResized; }
 		void ResetWindowResized() { bFramebufferResized = false; }
+		void CreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
+		const uint32_t GetWidth() const { return width; }
+		const uint32_t GetHeight() const { return height; }
 
 	private:
 		void InitWindow();
@@ -25,11 +27,10 @@ namespace Lit
 	public:
 		GLFWwindow* Window;
 	private:
-		const uint32_t mWidth;
-		const uint32_t mHeight;
-		std::string mWindowName;
+		uint32_t width;
+		uint32_t height;
+		std::string windowName;
 		bool bFramebufferResized = false;
-
 	};
 }// namespace Lit
 

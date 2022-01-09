@@ -143,11 +143,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\LitApp.cpp" />
+    <ClCompile Include="Core\LitDevice.cpp" />
+    <ClCompile Include="Core\LitPipeline.cpp" />
+    <ClCompile Include="Core\LitSwapChain.cpp" />
     <ClCompile Include="Core\LitWindow.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\LitApp.h" />
+    <ClInclude Include="Core\LitDevice.h" />
+    <ClInclude Include="Core\LitPipeline.h" />
+    <ClInclude Include="Core\LitSwapChain.h" />
+    <ClInclude Include="Core\LitPipelineUtils.h" />
     <ClInclude Include="Core\LitWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
