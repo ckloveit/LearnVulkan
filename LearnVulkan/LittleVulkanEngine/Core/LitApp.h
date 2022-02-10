@@ -3,6 +3,8 @@
 #include "LitPipeline.h"
 #include "LitSwapChain.h"
 #include "LitWindow.h"
+#include "LitModel.h"
+
 namespace Lit
 {
 	class LitApp
@@ -27,6 +29,7 @@ namespace Lit
 		LitSwapChain swapChain = { window, device };
 		LitPipeline pipeline = { "../Shaders/Spv/simple_shader", device, swapChain };
 		std::vector<VkCommandBuffer> commandBuffers;
+		LitModel simpleModel{ device };
 
 	};
 }

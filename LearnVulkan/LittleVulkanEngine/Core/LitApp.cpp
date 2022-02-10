@@ -62,7 +62,9 @@ namespace Lit
 
 			pipeline.Bind(commandBuffers[i]);
 
-			vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+			//vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+			simpleModel.Bind(commandBuffers[i]);
+			simpleModel.Draw(commandBuffers[i]);
 
 			vkCmdEndRenderPass(commandBuffers[i]);
 			if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) 

@@ -54,8 +54,13 @@ namespace Lit
 		createInfo.imageColorSpace = surfaceFormat.colorSpace;
 		createInfo.imageExtent = extent;
 		createInfo.imageArrayLayers = 1;
-		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
+		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;//直接渲染到屏幕
+		// post-processing 则用VK_IMAGE_USAGE_TRANSFER_DST_BIT
+		/*如果上述graphics和present所使用的queue不是一个queue，图像将会涉及到跨queue family的共享操作。可用的操作如下
+		VK_SHARING_MODE_EXCLUSIVE：一个队列类型（Graphics）独占，显式传送给另一个（Present）队列。这种方法性能最好
+		VK_SHARING_MODE_CONCURRENT：共享模式
+		若不是一个queue，这里考虑到简洁性采用共享模式
+		*/
 		QueueFamilyIndices indices = device.FindPhysicalQueueFamilies();
 		uint32_t queueFamilyIndices[] = { indices.graphicsFamily, indices.presentFamily };
 		if (indices.graphicsFamily != indices.presentFamily)
@@ -344,7 +349,8 @@ namespace Lit
 				device.GetDevice(),
 				&framebufferInfo,
 				nullptr,
-				&swapChainFrameBuffers[i]) != VK_SUCCESS) {
+				&swapChainFrameBuffers[i]) != VK_SUCCESS)
+			{
 				throw std::runtime_error("failed to create framebuffer!");
 			}
 		}

@@ -73,7 +73,7 @@ namespace Lit
 
 		// Vulkan Object Create
 		void CreateInstance();
-		void SetupDebugMessenger();
+		void CreateDebugMessenger();
 		void CreateSurface();
 		void PickPhyscialDevice();
 		void CreateLogicalDevice();
@@ -95,7 +95,7 @@ namespace Lit
 
 		VkQueue graphicsQueue;
 		VkQueue presentQueue;
-
+		// The VK_LAYER_KHRONOS_validation contains all current validation functionality.
 		const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 		const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 #ifdef NDEBUG

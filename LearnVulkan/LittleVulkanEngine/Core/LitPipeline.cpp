@@ -1,5 +1,6 @@
 #include "LitPipeline.h"
 #include "LitPipelineUtils.h"
+#include "LitModel.h"
 
 #include <fstream>
 #include <iostream>
@@ -52,12 +53,22 @@ namespace Lit
 		auto vertShaderStageInfo = PipelineUtils::ShaderStage(vertShaderModule, VK_SHADER_STAGE_VERTEX_BIT);
 		auto fragShaderStageInfo = PipelineUtils::ShaderStage(fragShaderModule, VK_SHADER_STAGE_FRAGMENT_BIT);
 		VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
+
+		auto bindingDescriptions = LitModel::Vertex::GetVertexInputBindingDesc();
+		auto attributeDescriptions = LitModel::Vertex::GetVertexInputAttributeDesc();
+
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputInfo.vertexBindingDescriptionCount = 0;
-		vertexInputInfo.pVertexBindingDescriptions = nullptr;  // Optional
-		vertexInputInfo.vertexAttributeDescriptionCount = 0;
-		vertexInputInfo.pVertexAttributeDescriptions = nullptr;  // Optional
+		//vertexInputInfo.vertexBindingDescriptionCount = 0;
+		//vertexInputInfo.pVertexBindingDescriptions = nullptr;  // Optional
+		//vertexInputInfo.vertexAttributeDescriptionCount = 0;
+		//vertexInputInfo.pVertexAttributeDescriptions = nullptr;  // Optional
+		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
+		vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+		vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+
+
 
 		auto inputAssembly = PipelineUtils::VertexInputAssemblyState();
 		VkExtent2D swapChainExtent = swapChain.GetSwapChainExtent();

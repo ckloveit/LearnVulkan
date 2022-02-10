@@ -436,7 +436,7 @@ namespace Lit
 	void LitDevice::Init()
 	{
 		CreateInstance();
-		SetupDebugMessenger();
+		CreateDebugMessenger();
 		CreateSurface();
 		PickPhyscialDevice();
 		CreateLogicalDevice();
@@ -501,7 +501,7 @@ namespace Lit
 		HasGLFWRequiredInstanceExtensions();
 	}
 
-	void LitDevice::SetupDebugMessenger()
+	void LitDevice::CreateDebugMessenger()
 	{
 		if (!enableValidationLayers)
 		{

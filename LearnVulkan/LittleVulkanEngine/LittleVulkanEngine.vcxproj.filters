@@ -33,6 +33,9 @@
     <ClCompile Include="Core\LitSwapChain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Core\LitModel.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\LitWindow.h">
@@ -51,6 +54,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Core\LitPipelineUtils.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\LitModel.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
