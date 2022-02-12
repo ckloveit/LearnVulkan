@@ -158,6 +158,7 @@
     <ClInclude Include="Core\LitApp.h" />
     <ClInclude Include="Core\LitComponent.h" />
     <ClInclude Include="Core\LitDevice.h" />
+    <ClInclude Include="Core\LitGameObject.h" />
     <ClInclude Include="Core\LitModel.h" />
     <ClInclude Include="Core\LitPipeline.h" />
     <ClInclude Include="Core\LitSwapChain.h" />

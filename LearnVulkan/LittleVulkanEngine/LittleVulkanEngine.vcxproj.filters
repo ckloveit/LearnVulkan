@@ -62,5 +62,8 @@
     <ClInclude Include="Core\LitComponent.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Core\LitGameObject.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

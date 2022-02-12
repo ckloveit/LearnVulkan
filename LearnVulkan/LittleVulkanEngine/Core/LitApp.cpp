@@ -1,12 +1,20 @@
 #include "LitApp.h"
 #include <array>
 #include <stdexcept>
+#define PI 3.1415926f
 
 namespace Lit
 {
+	struct SimplePushConstantData
+	{
+		glm::mat2 transform{ 1.0f };
+		glm::vec2 translation;
+		alignas(16) glm::vec3 color;
+	};
+
 	LitApp::LitApp() 
 	{
-		LoadModels();
+		LoadGameObjects();
 		CreatePipelineLayout();
 		ReCreateSwapChain();
 		CreateCommandBuffers(); 
@@ -27,12 +35,17 @@ namespace Lit
 	}
 	void LitApp::CreatePipelineLayout()
 	{
+		VkPushConstantRange pushConstantRange{};
+		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+		pushConstantRange.offset = 0;
+		pushConstantRange.size = sizeof(SimplePushConstantData);
+
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		pipelineLayoutInfo.setLayoutCount = 0;
 		pipelineLayoutInfo.pSetLayouts = nullptr;
-		pipelineLayoutInfo.pushConstantRangeCount = 0;
-		pipelineLayoutInfo.pPushConstantRanges = nullptr;
+		pipelineLayoutInfo.pushConstantRangeCount = 1;
+		pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 		if (vkCreatePipelineLayout(device.GetDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) 
 		{
 			throw std::runtime_error("failed to create pipeline layout!");
@@ -75,13 +88,22 @@ namespace Lit
 		CreatePipeline();
 	}
 
-	void LitApp::LoadModels()
+	void LitApp::LoadGameObjects()
 	{
 		std::vector<LitModel::Vertex> vertices;
 		vertices.emplace_back(LitModel::Vertex{ glm::vec2{0.0f, -0.5f} , glm::vec3(1.0f,0.0,0.0f)});
 		vertices.emplace_back(LitModel::Vertex{ glm::vec2{0.5f, 0.5f} , glm::vec3(0.0f,0.0,0.0f) });
 		vertices.emplace_back(LitModel::Vertex{ glm::vec2{-0.5f, 0.5f}, glm::vec3(0.0f,0.0,1.0f) });
-		litModel = std::make_unique<LitModel>(device, vertices);
+		auto litModel = std::make_shared<LitModel>(device, vertices);
+
+		auto triangle = LitGameObject::CreateGameObject();
+		triangle.model = litModel;
+		triangle.color = glm::vec3{ 1.0f, 0.0f, 0.1f };
+		triangle.transform2DComp.translation.x = .2f;
+		triangle.transform2DComp.scale = glm::vec2{ 2.f, .5f };
+		triangle.transform2DComp.rotation = .25f * 2.0f * PI;
+
+		gameObjects.push_back(std::move(triangle));
 	}
 
 	void LitApp::CreateCommandBuffers()
@@ -127,11 +149,17 @@ namespace Lit
 
 			vkCmdBeginRenderPass(commandBuffers[imageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 			{
-				pipeline->Bind(commandBuffers[imageIndex]);
-
-				//vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
-				litModel->Bind(commandBuffers[imageIndex]);
-				litModel->Draw(commandBuffers[imageIndex]);
+				VkViewport viewport{};
+				viewport.x = 0.0f;
+				viewport.y = 0.0f;
+				viewport.width = static_cast<float>(swapChain->GetSwapChainExtent().width);
+				viewport.height = static_cast<float>(swapChain->GetSwapChainExtent().height);
+				viewport.minDepth = 0.0f;
+				viewport.maxDepth = 1.0f;
+				VkRect2D scissor{ {0, 0}, swapChain->GetSwapChainExtent() };
+				vkCmdSetViewport(commandBuffers[imageIndex], 0, 1, &viewport);
+				vkCmdSetScissor(commandBuffers[imageIndex], 0, 1, &scissor);
+				RenderGameObjects(commandBuffers[imageIndex]);
 			}
 			vkCmdEndRenderPass(commandBuffers[imageIndex]);
 			
@@ -142,6 +170,26 @@ namespace Lit
 		}
 
 	}
+
+	void LitApp::RenderGameObjects(VkCommandBuffer commonBuffer)
+	{
+		pipeline->Bind(commonBuffer);
+
+		for (auto& obj : gameObjects)
+		{
+			obj.transform2DComp.rotation = glm::mod(obj.transform2DComp.rotation + 0.01f, 2.0f * PI);
+			SimplePushConstantData push{};
+			push.translation = obj.transform2DComp.translation;
+			push.color = obj.color;
+			push.transform = obj.transform2DComp.LocalToWorldMatrix();
+
+			vkCmdPushConstants(commonBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+				0, sizeof(SimplePushConstantData), &push);
+			obj.model->Bind(commonBuffer);
+			obj.model->Draw(commonBuffer);
+		}
+	}
+
 	void LitApp::DrawFrame()
 	{
 		uint32_t imageIndex;

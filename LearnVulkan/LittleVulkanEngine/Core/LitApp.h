@@ -3,7 +3,7 @@
 #include "LitPipeline.h"
 #include "LitSwapChain.h"
 #include "LitWindow.h"
-#include "LitModel.h"
+#include "LitGameObject.h"
 
 namespace Lit
 {
@@ -29,8 +29,11 @@ namespace Lit
 		void ReCreateSwapChain();
 		void RecordCommandBuffer(int imageIndex);
 
+
+		void RenderGameObjects(VkCommandBuffer commonBuffer);
+
 		// 
-		void LoadModels();
+		void LoadGameObjects();
 
 	private:
 		LitWindow window = { WIDTH, HEIGHT, "Hello Vulkan" };
@@ -40,6 +43,6 @@ namespace Lit
 
 		VkPipelineLayout pipelineLayout;
 		std::vector<VkCommandBuffer> commandBuffers;
-		std::unique_ptr<LitModel> litModel;
+		std::vector<LitGameObject> gameObjects;
 	};
 }
