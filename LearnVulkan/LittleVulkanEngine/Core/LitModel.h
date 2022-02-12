@@ -19,36 +19,21 @@ namespace Lit
 		{
 			glm::vec3 position;
 			glm::vec3 color;
+			glm::vec3 normal{};
+			glm::vec2 uv{};
 
-			static std::vector<VkVertexInputBindingDescription> GetVertexInputBindingDesc()
-			{
-				std::vector<VkVertexInputBindingDescription> bindingDescriptions(1, VkVertexInputBindingDescription{});
-				bindingDescriptions[0].binding = 0;
-				bindingDescriptions[0].stride = sizeof(Vertex);
-				bindingDescriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-				return bindingDescriptions;
-			}
-
-			static std::vector<VkVertexInputAttributeDescription> GetVertexInputAttributeDesc()
-			{
-				std::vector<VkVertexInputAttributeDescription> attributeDescriptions(2, VkVertexInputAttributeDescription{});
-				attributeDescriptions[0].binding = 0;
-				attributeDescriptions[0].location = 0;
-				attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-				attributeDescriptions[0].offset = offsetof(Vertex, position);
-
-				attributeDescriptions[1].binding = 0;
-				attributeDescriptions[1].location = 1;
-				attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-				attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-				return attributeDescriptions;
+			static std::vector<VkVertexInputBindingDescription> GetVertexInputBindingDesc();
+			static std::vector<VkVertexInputAttributeDescription> GetVertexInputAttributeDesc();
+			bool operator==(const Vertex& other) const {
+				return position == other.position && color == other.color && normal == other.normal &&
+					uv == other.uv;
 			}
 		};
 		struct Builder
 		{
 			std::vector<Vertex> vertices{};
 			std::vector<uint32_t> indices{};
+			void LoadModel(const std::string& filepath);
 		};
 
 		LitModel(LitDevice& device, const Builder& builder);
@@ -56,6 +41,9 @@ namespace Lit
 
 		LitModel(const LitModel&) = delete;
 		LitModel& operator=(const LitModel&) = delete;
+
+		static std::unique_ptr<LitModel> CreateModelFromFile(
+			LitDevice& device, const std::string& filepath);
 
 		void Draw(VkCommandBuffer commandBuffer);
 

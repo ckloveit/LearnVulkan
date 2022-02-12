@@ -128,11 +128,19 @@ namespace Lit
 	}
 	void LitApp::LoadGameObjects()
 	{
-		std::shared_ptr<LitModel> lveModel = CreateCubeModel(device, glm::vec3{ .0f, .0f, .0f });
+		/*std::shared_ptr<LitModel> lveModel = CreateCubeModel(device, glm::vec3{ .0f, .0f, .0f });
 		auto cube = LitGameObject::CreateGameObject();
 		cube.model = lveModel;
 		cube.transform.translation = glm::vec3{ .0f, .0f, 2.5f };
 		cube.transform.scale = glm::vec3{ .5f, .5f, .5f };
-		gameObjects.push_back(std::move(cube));
+		gameObjects.push_back(std::move(cube));*/
+
+		std::shared_ptr<LitModel> lveModel =
+			LitModel::CreateModelFromFile(device, "../models/smooth_vase.obj");
+		auto gameObj = LitGameObject::CreateGameObject();
+		gameObj.model = lveModel;
+		gameObj.transform.translation = glm::vec3{ .0f, .0f, 2.5f };
+		gameObj.transform.scale = glm::vec3(3.f);
+		gameObjects.push_back(std::move(gameObj));
 	}
 }

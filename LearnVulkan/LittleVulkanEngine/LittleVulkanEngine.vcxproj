@@ -116,7 +116,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(VK_SDK_PATH)\Include;$(SolutionDir)\ThirdParty\GLM;$(SolutionDir)\ThirdParty\GLFW\Include;$(ProjectDir)\External;$(ProjectDir)\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VK_SDK_PATH)\Include;$(SolutionDir)\ThirdParty\GLM;$(SolutionDir)\ThirdParty\GLFW\Include;$(ProjectDir);$(SolutionDir)\ThirdParty\tinyobjloader;$(SolutionDir)\ThirdParty;$(ProjectDir)\External;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -177,6 +178,7 @@
     <ClInclude Include="Core\LitRenderer.h" />
     <ClInclude Include="Core\LitSwapChain.h" />
     <ClInclude Include="Core\LitPipelineUtils.h" />
+    <ClInclude Include="Core\LitUtils.h" />
     <ClInclude Include="Core\LitWindow.h" />
     <ClInclude Include="External\imgui\imconfig.h" />
     <ClInclude Include="External\imgui\imgui.h" />
