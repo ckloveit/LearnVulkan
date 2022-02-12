@@ -17,7 +17,7 @@ namespace Lit
 	public:
 		struct Vertex
 		{
-			glm::vec2 position;
+			glm::vec3 position;
 			glm::vec3 color;
 
 			static std::vector<VkVertexInputBindingDescription> GetVertexInputBindingDesc()
@@ -34,7 +34,7 @@ namespace Lit
 				std::vector<VkVertexInputAttributeDescription> attributeDescriptions(2, VkVertexInputAttributeDescription{});
 				attributeDescriptions[0].binding = 0;
 				attributeDescriptions[0].location = 0;
-				attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+				attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
 				attributeDescriptions[0].offset = offsetof(Vertex, position);
 
 				attributeDescriptions[1].binding = 0;
@@ -45,8 +45,13 @@ namespace Lit
 				return attributeDescriptions;
 			}
 		};
-		
-		LitModel(LitDevice& device, const std::vector<Vertex>& vertices);
+		struct Builder
+		{
+			std::vector<Vertex> vertices{};
+			std::vector<uint32_t> indices{};
+		};
+
+		LitModel(LitDevice& device, const Builder& builder);
 		~LitModel() { CleanUp(); }
 
 		LitModel(const LitModel&) = delete;
@@ -57,6 +62,7 @@ namespace Lit
 		void Bind(VkCommandBuffer commandBuffer);
 	private:
 		void CreateVertexBuffer(const std::vector<Vertex>& vertices);
+		void createIndexBuffers(const std::vector<uint32_t>& indices);
 		void CleanUp();
 
 	private:
@@ -65,5 +71,11 @@ namespace Lit
 		VkBuffer vertexBuffer;
 		VkDeviceMemory vertexBufferMemory;
 		uint32_t vertexCount;
+
+		bool hasIndexBuffer = false;
+		VkBuffer indexBuffer;
+		VkDeviceMemory indexBufferMemory;
+		uint32_t indexCount;
+
 	};
 }

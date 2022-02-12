@@ -1,8 +1,8 @@
 #pragma once
-
-#include "../Core/LitDevice.h"
-#include "../Core/LitGameObject.h"
-#include "../Core/LitPipeline.h"
+#include "Core/LitCamera.h"
+#include "Core/LitDevice.h"
+#include "Core/LitGameObject.h"
+#include "Core/LitPipeline.h"
 
 // std
 #include <memory>
@@ -19,9 +19,8 @@ namespace Lit
 		SimpleRenderSystem(const SimpleRenderSystem&) = delete;
 		SimpleRenderSystem& operator=(const SimpleRenderSystem&) = delete;
 
-		void RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<LitGameObject>& gameObjects);
-
-	private:
+		void RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<LitGameObject>& gameObjects, const LitCamera& camera);
+	private:																						  
 		void CreatePipelineLayout();
 		void CreatePipeline(VkRenderPass renderPass);
 

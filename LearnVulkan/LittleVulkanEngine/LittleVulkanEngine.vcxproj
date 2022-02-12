@@ -147,6 +147,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\LitApp.cpp" />
+    <ClCompile Include="Core\LitCamera.cpp" />
     <ClCompile Include="Core\LitDevice.cpp" />
     <ClCompile Include="Core\LitModel.cpp" />
     <ClCompile Include="Core\LitPipeline.cpp" />
@@ -162,10 +163,12 @@
     <ClCompile Include="External\imgui\imgui_widgets.cpp" />
     <ClCompile Include="ImGui\LitImGui.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="System\InputSystem.cpp" />
     <ClCompile Include="System\simple_render_system.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\LitApp.h" />
+    <ClInclude Include="Core\LitCamera.h" />
     <ClInclude Include="Core\LitComponent.h" />
     <ClInclude Include="Core\LitDevice.h" />
     <ClInclude Include="Core\LitGameObject.h" />
@@ -184,6 +187,7 @@
     <ClInclude Include="External\imgui\imstb_textedit.h" />
     <ClInclude Include="External\imgui\imstb_truetype.h" />
     <ClInclude Include="ImGui\LitImGui.h" />
+    <ClInclude Include="System\InputSystem.h" />
     <ClInclude Include="System\simple_render_system.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

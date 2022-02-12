@@ -24,6 +24,7 @@ namespace Lit
 		{
 			return litSwapChain->GetRenderPass(); 
 		}
+		float GetAspectRatio() const {return litSwapChain->AspectRatio();}
 		bool IsFrameInProgress() const { return bIsFrameStarted; }
 		uint32_t GetImageCount() const { return litSwapChain->ImageCount(); }
 		VkCommandBuffer GetCurrentCommandBuffer() const 

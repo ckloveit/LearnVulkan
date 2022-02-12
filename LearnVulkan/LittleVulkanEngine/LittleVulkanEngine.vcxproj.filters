@@ -66,6 +66,12 @@
     <ClCompile Include="ImGui\LitImGui.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Core\LitCamera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="System\InputSystem.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\LitWindow.h">
@@ -126,6 +132,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\LitImGui.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\LitCamera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="System\InputSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

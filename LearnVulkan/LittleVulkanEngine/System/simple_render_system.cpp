@@ -16,9 +16,8 @@ namespace Lit
 {
 	struct SimplePushConstantData 
 	{
-		glm::mat2 transform{ 1.f };
-		glm::vec2 translation;
-		alignas(16) glm::vec3 color;
+		glm::mat4 transform{ 1.f };
+		alignas(16) glm::vec3 color{};
 	};
 
 	SimpleRenderSystem::SimpleRenderSystem(LitDevice& device, VkRenderPass renderPass)
@@ -65,16 +64,16 @@ namespace Lit
 			pipelineConfig);
 	}
 
-	void SimpleRenderSystem::RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<LitGameObject>& gameObjects) {
+	void SimpleRenderSystem::RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<LitGameObject>& gameObjects, const LitCamera& camera)
+	{
 		litPipeline->Bind(commandBuffer);
-
+		auto projectionView = camera.GetProjection() * camera.GetView();
 		for (auto& obj : gameObjects)
 		{
-			obj.transform2DComp.rotation = glm::mod(obj.transform2DComp.rotation + 0.01f, 2.0f * PI);
 			SimplePushConstantData push{};
-			push.translation = obj.transform2DComp.translation;
-			push.color = obj.color;
-			push.transform = obj.transform2DComp.LocalToWorldMatrix();
+			/*obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.0001f, 2.0f * PI);
+			obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.0005f, 2.0f * PI);*/
+			push.transform = projectionView * obj.transform.mat4();
 
 			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 				0, sizeof(SimplePushConstantData), &push);
