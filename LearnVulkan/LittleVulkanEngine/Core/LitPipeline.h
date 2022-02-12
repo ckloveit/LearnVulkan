@@ -45,7 +45,7 @@ namespace Lit
 		LitPipeline& operator=(const LitPipeline&) = delete;
 		void Bind(VkCommandBuffer comamndBuffer);
 		
-		static void DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo, uint32_t width, uint32_t height);
+		static void DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 
 	private:
 		static std::vector<char> ReadFile(const std::string& filename);

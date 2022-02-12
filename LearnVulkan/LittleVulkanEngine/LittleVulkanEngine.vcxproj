@@ -116,7 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(VK_SDK_PATH)\Include;$(SolutionDir)\ThirdParty\GLM;$(SolutionDir)\ThirdParty\GLFW\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VK_SDK_PATH)\Include;$(SolutionDir)\ThirdParty\GLM;$(SolutionDir)\ThirdParty\GLFW\Include;$(ProjectDir)\External;$(ProjectDir)\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -150,9 +150,19 @@
     <ClCompile Include="Core\LitDevice.cpp" />
     <ClCompile Include="Core\LitModel.cpp" />
     <ClCompile Include="Core\LitPipeline.cpp" />
+    <ClCompile Include="Core\LitRenderer.cpp" />
     <ClCompile Include="Core\LitSwapChain.cpp" />
     <ClCompile Include="Core\LitWindow.cpp" />
+    <ClCompile Include="External\imgui\imgui.cpp" />
+    <ClCompile Include="External\imgui\imgui_demo.cpp" />
+    <ClCompile Include="External\imgui\imgui_draw.cpp" />
+    <ClCompile Include="External\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="External\imgui\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="External\imgui\imgui_tables.cpp" />
+    <ClCompile Include="External\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="ImGui\LitImGui.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="System\simple_render_system.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\LitApp.h" />
@@ -161,9 +171,20 @@
     <ClInclude Include="Core\LitGameObject.h" />
     <ClInclude Include="Core\LitModel.h" />
     <ClInclude Include="Core\LitPipeline.h" />
+    <ClInclude Include="Core\LitRenderer.h" />
     <ClInclude Include="Core\LitSwapChain.h" />
     <ClInclude Include="Core\LitPipelineUtils.h" />
     <ClInclude Include="Core\LitWindow.h" />
+    <ClInclude Include="External\imgui\imconfig.h" />
+    <ClInclude Include="External\imgui\imgui.h" />
+    <ClInclude Include="External\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="External\imgui\imgui_impl_vulkan.h" />
+    <ClInclude Include="External\imgui\imgui_internal.h" />
+    <ClInclude Include="External\imgui\imstb_rectpack.h" />
+    <ClInclude Include="External\imgui\imstb_textedit.h" />
+    <ClInclude Include="External\imgui\imstb_truetype.h" />
+    <ClInclude Include="ImGui\LitImGui.h" />
+    <ClInclude Include="System\simple_render_system.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

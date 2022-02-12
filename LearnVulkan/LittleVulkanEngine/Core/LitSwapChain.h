@@ -21,7 +21,7 @@ namespace Lit
 		{
 			Init();
 		}
-		LitSwapChain(LitDevice& deviceRef, VkExtent2D windowExtent, std::unique_ptr<LitSwapChain> previousSwapChain);
+		LitSwapChain(LitDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<LitSwapChain> previousSwapChain);
 
 		LitSwapChain(const LitSwapChain&) = delete;
 		LitSwapChain& operator=(const LitSwapChain&) = delete;
@@ -43,6 +43,11 @@ namespace Lit
 		VkResult AcquireNextImage(uint32_t* imageIndex);
 		VkResult SumitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);
 
+		bool CompareSwapFormats(const LitSwapChain& swapChain) const
+		{
+			return swapChain.swapChainDepthFormat == swapChainDepthFormat &&
+				swapChain.swapChainImageFormat == swapChainImageFormat;
+		}
 	private:
 		void Init();
 		void CleanUpSyncObjects();
@@ -72,10 +77,12 @@ namespace Lit
 		std::vector<VkImageView> depthImageViews;
 
 		VkSwapchainKHR swapChain;
-		std::unique_ptr<LitSwapChain> oldSwapChain;
+		std::shared_ptr<LitSwapChain> oldSwapChain;
 
 		VkExtent2D swapChainExtent;
 		VkFormat swapChainImageFormat;
+		VkFormat swapChainDepthFormat;
+
 		std::vector<VkImage> swapChainImages;
 		std::vector<VkImageView> swapChainImageViews;
 		std::vector<VkFramebuffer> swapChainFrameBuffers;

@@ -40,6 +40,10 @@ namespace Lit
 		VkQueue GetGraphicsQueue() { return graphicsQueue; }
 		VkQueue GetPresentQueue() { return presentQueue; }
 
+		VkInstance GetInstance() { return instance; }
+		VkPhysicalDevice GetPhysicalDevice() { return physicalDevice; }
+		uint32_t GetGraphicsQueueFamily() { return FindPhysicalQueueFamilies().graphicsFamily; }
+
 		// Command Pool
 		VkCommandPool GetCommandPool() { return commandPool; }
 		SwapChainSupportDetails GetSwapChainSupportDetail() { return QuerySwapChainSupport(physicalDevice); }

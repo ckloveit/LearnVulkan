@@ -26,17 +26,18 @@ namespace Lit
 		bool IsWindowResized() { return framebufferResized; }
 		void ResetWindowResizedFlag() { framebufferResized = false; }
 
+		GLFWwindow* GetWindow() const { return Window; }
 	private:
 		void InitWindow();
 		static void FrameBufferResizeCallback(GLFWwindow* window, int width, int height);
-	public:
-		GLFWwindow* Window;
 	private:
 		uint32_t width;
 		uint32_t height;
 		bool framebufferResized = false;
 		std::string windowName;
 		bool bFramebufferResized = false;
+		// GLFW Window
+		GLFWwindow* Window;
 	};
 }// namespace Lit
 

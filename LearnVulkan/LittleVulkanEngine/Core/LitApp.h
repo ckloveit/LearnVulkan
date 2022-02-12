@@ -4,6 +4,7 @@
 #include "LitSwapChain.h"
 #include "LitWindow.h"
 #include "LitGameObject.h"
+#include "LitRenderer.h"
 
 namespace Lit
 {
@@ -21,16 +22,16 @@ namespace Lit
 		void Run();
 
 	private:
-		void CreatePipelineLayout();
-		void CreatePipeline();
-		void CreateCommandBuffers();
-		void DrawFrame();
+		//void CreatePipelineLayout();
+		//void CreatePipeline();
+		//void CreateCommandBuffers();
+		//void DrawFrame();
 
-		void ReCreateSwapChain();
-		void RecordCommandBuffer(int imageIndex);
+		//void ReCreateSwapChain();
+		//void RecordCommandBuffer(int imageIndex);
 
 
-		void RenderGameObjects(VkCommandBuffer commonBuffer);
+		//void RenderGameObjects(VkCommandBuffer commonBuffer);
 
 		// 
 		void LoadGameObjects();
@@ -38,11 +39,7 @@ namespace Lit
 	private:
 		LitWindow window = { WIDTH, HEIGHT, "Hello Vulkan" };
 		LitDevice device = { window };
-		std::unique_ptr<LitSwapChain> swapChain;
-		std::unique_ptr<LitPipeline> pipeline;
-
-		VkPipelineLayout pipelineLayout;
-		std::vector<VkCommandBuffer> commandBuffers;
+		LitRenderer litRenderer { window, device };
 		std::vector<LitGameObject> gameObjects;
 	};
 }
