@@ -18,6 +18,7 @@ namespace Lit
 		struct Vertex
 		{
 			glm::vec2 position;
+			glm::vec3 color;
 
 			static std::vector<VkVertexInputBindingDescription> GetVertexInputBindingDesc()
 			{
@@ -30,16 +31,22 @@ namespace Lit
 
 			static std::vector<VkVertexInputAttributeDescription> GetVertexInputAttributeDesc()
 			{
-				std::vector<VkVertexInputAttributeDescription> attributeDescriptions(1, VkVertexInputAttributeDescription{});
+				std::vector<VkVertexInputAttributeDescription> attributeDescriptions(2, VkVertexInputAttributeDescription{});
 				attributeDescriptions[0].binding = 0;
 				attributeDescriptions[0].location = 0;
 				attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-				attributeDescriptions[0].offset = 0;
+				attributeDescriptions[0].offset = offsetof(Vertex, position);
+
+				attributeDescriptions[1].binding = 0;
+				attributeDescriptions[1].location = 1;
+				attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+				attributeDescriptions[1].offset = offsetof(Vertex, color);
+
 				return attributeDescriptions;
 			}
 		};
 		
-		LitModel(LitDevice& device);
+		LitModel(LitDevice& device, const std::vector<Vertex>& vertices);
 		~LitModel() {}
 
 		LitModel(const LitModel&) = delete;
@@ -49,8 +56,7 @@ namespace Lit
 
 		void Bind(VkCommandBuffer commandBuffer);
 	private:
-		void InitMeshVertices();
-		void CreateVertexBuffer();
+		void CreateVertexBuffer(const std::vector<Vertex>& vertices);
 		void CleanUp();
 
 	private:
@@ -59,9 +65,5 @@ namespace Lit
 		VkBuffer vertexBuffer;
 		VkDeviceMemory vertexBufferMemory;
 		uint32_t vertexCount;
-		
-		std::vector<Vertex> vertices;
-
-
 	};
 }

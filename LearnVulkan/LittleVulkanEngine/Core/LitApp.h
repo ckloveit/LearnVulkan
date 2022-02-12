@@ -21,15 +21,23 @@ namespace Lit
 		void Run();
 
 	private:
+		void CreatePipelineLayout();
+		void CreatePipeline();
 		void CreateCommandBuffers();
 		void DrawFrame();
+
+		// 
+		void LoadModels();
+
 	private:
 		LitWindow window = { WIDTH, HEIGHT, "Hello Vulkan" };
 		LitDevice device = { window };
 		LitSwapChain swapChain = { window, device };
-		LitPipeline pipeline = { "../Shaders/Spv/simple_shader", device, swapChain };
+		//LitPipeline pipeline = { "../Shaders/Spv/simple_shader", device, swapChain };
+		std::unique_ptr<LitPipeline> pipeline;
+		VkPipelineLayout pipelineLayout;
 		std::vector<VkCommandBuffer> commandBuffers;
-		LitModel simpleModel{ device };
+		std::unique_ptr<LitModel> litModel;
 
 	};
 }

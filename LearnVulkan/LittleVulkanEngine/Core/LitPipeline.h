@@ -8,28 +8,56 @@
 
 namespace Lit
 {
+	struct PipelineConfigInfo
+	{
+		PipelineConfigInfo(const PipelineConfigInfo&) = delete;
+		PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
+
+		VkViewport viewport;
+		VkRect2D scissor;
+		VkPipelineViewportStateCreateInfo viewportInfo;
+		VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
+		VkPipelineRasterizationStateCreateInfo rasterizationInfo;
+		VkPipelineMultisampleStateCreateInfo multisampleInfo;
+		VkPipelineColorBlendAttachmentState colorBlendAttachment;
+		VkPipelineColorBlendStateCreateInfo colorBlendInfo;
+		VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
+		VkPipelineLayout pipelineLayout = nullptr;
+		VkRenderPass renderPass = nullptr;
+		uint32_t subpass = 0;
+	};
+
+
 	class LitPipeline
 	{
 	public:
-		LitPipeline(std::string inFilePrefix, LitDevice& inDevice, LitSwapChain& inSwapChain);
+		LitPipeline(
+			LitDevice& device,
+			const std::string& vertFilepath,
+			const std::string& fragFilepath,
+			const PipelineConfigInfo& configInfo);
 		~LitPipeline();
 
 		LitPipeline(const LitPipeline&) = delete;
 		LitPipeline& operator=(const LitPipeline&) = delete;
 		void Bind(VkCommandBuffer comamndBuffer);
+		
+		static void DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo, uint32_t width, uint32_t height);
+
 	private:
 		static std::vector<char> ReadFile(const std::string& filename);
 
-		void CreateGraphicsPipeline();
-
+		void CreateGraphicsPipeline(const std::string& vertFilepath,
+			const std::string& fragFilepath,
+			const PipelineConfigInfo& configInfo);
 		VkShaderModule CreateShaderModule(const std::vector<char>& code);
 	private:
 		std::string filePrefix;
 		LitDevice& device;
-		LitSwapChain& swapChain;
 
-		VkPipelineLayout pipelineLayout;
 		VkPipeline graphicsPipeline;
+		VkShaderModule vertShaderModule;
+		VkShaderModule fragShaderModule;
 	};
 
 }  // namespace Lit

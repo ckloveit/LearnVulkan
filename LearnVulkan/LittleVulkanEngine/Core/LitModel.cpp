@@ -13,20 +13,14 @@
 
 namespace Lit
 {
-	LitModel::LitModel(LitDevice& InDevice) :
+	LitModel::LitModel(LitDevice& InDevice, const std::vector<Vertex>& vertices) :
 		device(InDevice) 
 	{ 
-		InitMeshVertices();
-		CreateVertexBuffer(); 
-	}
-	void LitModel::InitMeshVertices()
-	{
-		vertices.emplace_back(Vertex{ glm::vec2{0.0f, -0.5f} });
-		vertices.emplace_back(Vertex{ glm::vec2{0.5f, 0.5f} });
-		vertices.emplace_back(Vertex{ glm::vec2{-0.5f, 0.5f} });
+		CreateVertexBuffer(vertices);
 	}
 
-	void LitModel::CreateVertexBuffer()
+
+	void LitModel::CreateVertexBuffer(const std::vector<Vertex>& vertices)
 	{
 		vertexCount = static_cast<uint32_t>(vertices.size());
 		assert(vertexCount >= 3 && "vertex count must be at least 3");
