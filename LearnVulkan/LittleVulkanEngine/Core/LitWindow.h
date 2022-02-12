@@ -21,6 +21,10 @@ namespace Lit
 		void CreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 		const uint32_t GetWidth() const { return width; }
 		const uint32_t GetHeight() const { return height; }
+		VkExtent2D GetExtent() { return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) }; }
+		
+		bool IsWindowResized() { return framebufferResized; }
+		void ResetWindowResizedFlag() { framebufferResized = false; }
 
 	private:
 		void InitWindow();
@@ -30,6 +34,7 @@ namespace Lit
 	private:
 		uint32_t width;
 		uint32_t height;
+		bool framebufferResized = false;
 		std::string windowName;
 		bool bFramebufferResized = false;
 	};

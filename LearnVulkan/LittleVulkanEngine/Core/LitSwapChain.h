@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 // std lib headers
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -16,10 +17,12 @@ namespace Lit
 	public:
 		static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-		LitSwapChain(LitWindow& inWindow, LitDevice& inDevice) : window(inWindow), device(inDevice)
+		LitSwapChain(LitDevice& deviceRef, VkExtent2D inWindowExtent) : windowExtent(inWindowExtent), device(deviceRef)
 		{
 			Init();
 		}
+		LitSwapChain(LitDevice& deviceRef, VkExtent2D windowExtent, std::unique_ptr<LitSwapChain> previousSwapChain);
+
 		LitSwapChain(const LitSwapChain&) = delete;
 		LitSwapChain& operator=(const LitSwapChain&) = delete;
 
@@ -46,7 +49,6 @@ namespace Lit
 		void CleanupSwapChain();
 
 		void CreateSwapChain();
-		void RecreateSwapChain();
 
 		void CreateImageViews();
 		void CreateDepthResources();
@@ -60,8 +62,8 @@ namespace Lit
 		VkExtent2D ChooseSwapChainExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
 	private:
-		LitWindow& window;
 		LitDevice& device;
+		VkExtent2D windowExtent;
 
 		VkRenderPass renderPass;
 
@@ -70,6 +72,8 @@ namespace Lit
 		std::vector<VkImageView> depthImageViews;
 
 		VkSwapchainKHR swapChain;
+		std::unique_ptr<LitSwapChain> oldSwapChain;
+
 		VkExtent2D swapChainExtent;
 		VkFormat swapChainImageFormat;
 		std::vector<VkImage> swapChainImages;

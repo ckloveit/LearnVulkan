@@ -13,6 +13,14 @@ namespace Lit
 		CreateSyncObjects();
 	}
 
+	LitSwapChain::LitSwapChain(LitDevice& deviceRef, VkExtent2D inWindowExtent, std::unique_ptr<LitSwapChain> previousSwapChain)
+		: device(deviceRef), windowExtent(inWindowExtent), oldSwapChain(std::move(previousSwapChain))
+	{
+		Init();
+
+		// clean up old swap chain since it's no longer needed
+		oldSwapChain = nullptr;
+	}
 	void LitSwapChain::CleanUpSyncObjects()
 	{
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
@@ -79,7 +87,8 @@ namespace Lit
 		createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 		createInfo.presentMode = presentMode;
 		createInfo.clipped = VK_TRUE;
-		createInfo.oldSwapchain = VK_NULL_HANDLE;
+		createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain->swapChain;
+
 		if (vkCreateSwapchainKHR(device.GetDevice(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) 
 		{
 			throw std::runtime_error("failed to create swap chain!");
@@ -95,23 +104,6 @@ namespace Lit
 		swapChainImageFormat = surfaceFormat.format;
 		swapChainExtent = extent;
 	}
-
-
-	void LitSwapChain::RecreateSwapChain()
-	{
-		while (window.GetWidth() == 0 || window.GetHeight() == 0)
-		{
-			glfwWaitEvents();
-		}
-		vkDeviceWaitIdle(device.GetDevice());
-		CleanupSwapChain();
-		CreateSwapChain();
-		CreateImageViews();
-		CreateRenderPass();
-		CreateDepthResources();
-		CreateFrameBuffers();
-	}
-
 
 	VkResult LitSwapChain::AcquireNextImage(uint32_t* imageIndex)
 	{
@@ -429,7 +421,7 @@ namespace Lit
 		}
 		else
 		{
-			VkExtent2D actualExtent = { static_cast<uint32_t>(window.GetWidth()), static_cast<uint32_t>(window.GetHeight()) };
+			VkExtent2D actualExtent = { static_cast<uint32_t>(windowExtent.width), static_cast<uint32_t>(windowExtent.height) };
 			actualExtent.width = std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, actualExtent.width));
 			actualExtent.height = std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height));
 			return actualExtent;

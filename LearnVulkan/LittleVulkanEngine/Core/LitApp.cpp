@@ -8,7 +8,7 @@ namespace Lit
 	{
 		LoadModels();
 		CreatePipelineLayout();
-		CreatePipeline();
+		ReCreateSwapChain();
 		CreateCommandBuffers(); 
 	}
 	LitApp::~LitApp()
@@ -43,9 +43,9 @@ namespace Lit
 		PipelineConfigInfo pipelineConfig{};
 		LitPipeline::DefaultPipelineConfigInfo(
 			pipelineConfig,
-			swapChain.GetSwapChainExtent().width,
-			swapChain.GetSwapChainExtent().height);
-		pipelineConfig.renderPass = swapChain.GetRenderPass();
+			swapChain->GetSwapChainExtent().width,
+			swapChain->GetSwapChainExtent().height);
+		pipelineConfig.renderPass = swapChain->GetRenderPass();
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		pipeline = std::make_unique<LitPipeline>(
 			device,
@@ -53,6 +53,28 @@ namespace Lit
 			"../Shaders/Spv/simple_shader.frag.spv",
 			pipelineConfig);
 	}
+	void LitApp::ReCreateSwapChain()
+	{
+		auto extent = window.GetExtent();
+		while (extent.width == 0 || extent.height == 0) 
+		{
+			extent = window.GetExtent();
+			glfwWaitEvents();
+		}
+
+		vkDeviceWaitIdle(device.GetDevice());
+
+		if(swapChain == nullptr)
+		{
+			swapChain = std::make_unique<LitSwapChain>(device, extent);
+		}
+		else
+		{
+			swapChain = std::make_unique<LitSwapChain>(device, extent, std::move(swapChain));
+		}
+		CreatePipeline();
+	}
+
 	void LitApp::LoadModels()
 	{
 		std::vector<LitModel::Vertex> vertices;
@@ -64,36 +86,38 @@ namespace Lit
 
 	void LitApp::CreateCommandBuffers()
 	{
-		commandBuffers.resize(swapChain.ImageCount());
+		commandBuffers.resize(swapChain->ImageCount());
 		VkCommandBufferAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocInfo.commandPool = device.GetCommandPool();
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
-		if (vkAllocateCommandBuffers(device.GetDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS) 
+		if (vkAllocateCommandBuffers(device.GetDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to allocate command buffers!");
 		}
+	}
 
-		for (size_t i = 0; i < commandBuffers.size(); i++)
+	void LitApp::RecordCommandBuffer(int imageIndex)
+	{
 		{
 			VkCommandBufferBeginInfo beginInfo = {};
 			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 			beginInfo.flags = 0;                   // Optional
 			beginInfo.pInheritanceInfo = nullptr;  // Optional
 
-			if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) 
+			if (vkBeginCommandBuffer(commandBuffers[imageIndex], &beginInfo) != VK_SUCCESS)
 			{
 				throw std::runtime_error("failed to begin recording command buffer!");
 			}
 
 			VkRenderPassBeginInfo renderPassInfo = {};
 			renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-			renderPassInfo.renderPass = swapChain.GetRenderPass();
-			renderPassInfo.framebuffer = swapChain.GetFrameBuffer(i);
+			renderPassInfo.renderPass = swapChain->GetRenderPass();
+			renderPassInfo.framebuffer = swapChain->GetFrameBuffer(imageIndex);
 
 			renderPassInfo.renderArea.offset = { 0, 0 };
-			renderPassInfo.renderArea.extent = swapChain.GetSwapChainExtent();
+			renderPassInfo.renderArea.extent = swapChain->GetSwapChainExtent();
 
 			std::array<VkClearValue, 2> clearValues{};
 			clearValues[0].color = { 0.1f, 0.2f, 0.4f, 1.0f };
@@ -101,16 +125,17 @@ namespace Lit
 			renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 			renderPassInfo.pClearValues = clearValues.data();
 
-			vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdBeginRenderPass(commandBuffers[imageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+			{
+				pipeline->Bind(commandBuffers[imageIndex]);
 
-			pipeline->Bind(commandBuffers[i]);
-
-			//vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
-			litModel->Bind(commandBuffers[i]);
-			litModel->Draw(commandBuffers[i]);
-
-			vkCmdEndRenderPass(commandBuffers[i]);
-			if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) 
+				//vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+				litModel->Bind(commandBuffers[imageIndex]);
+				litModel->Draw(commandBuffers[imageIndex]);
+			}
+			vkCmdEndRenderPass(commandBuffers[imageIndex]);
+			
+			if (vkEndCommandBuffer(commandBuffers[imageIndex]) != VK_SUCCESS)
 			{
 				throw std::runtime_error("failed to record command buffer!");
 			}
@@ -121,14 +146,27 @@ namespace Lit
 	{
 		uint32_t imageIndex;
 
-		auto result = swapChain.AcquireNextImage(&imageIndex);
+		auto result = swapChain->AcquireNextImage(&imageIndex);
+		if (result == VK_ERROR_OUT_OF_DATE_KHR) 
+		{
+			ReCreateSwapChain();
+			return;
+		}
 		if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
 		{
 			throw std::runtime_error("failed to acquire swap chain image!");
 		}
 
-		result = swapChain.SumitCommandBuffers(&commandBuffers[imageIndex], &imageIndex);
-		if (result != VK_SUCCESS) 
+		RecordCommandBuffer(imageIndex);
+
+		result = swapChain->SumitCommandBuffers(&commandBuffers[imageIndex], &imageIndex);
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window.IsWindowResized()) 
+		{
+			window.ResetWindowResized();
+			ReCreateSwapChain();
+			return;
+		}
+		else if (result != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to present swap chain image!");
 		}

@@ -59,5 +59,8 @@
     <ClInclude Include="Core\LitModel.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Core\LitComponent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

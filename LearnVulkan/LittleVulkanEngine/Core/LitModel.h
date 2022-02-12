@@ -47,7 +47,7 @@ namespace Lit
 		};
 		
 		LitModel(LitDevice& device, const std::vector<Vertex>& vertices);
-		~LitModel() {}
+		~LitModel() { CleanUp(); }
 
 		LitModel(const LitModel&) = delete;
 		LitModel& operator=(const LitModel&) = delete;
