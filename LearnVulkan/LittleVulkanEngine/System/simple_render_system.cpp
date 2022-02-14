@@ -16,14 +16,15 @@ namespace Lit
 {
 	struct SimplePushConstantData 
 	{
-		glm::mat4 transform{ 1.f };
-		alignas(16) glm::vec3 color{};
+		glm::mat4 modelMatrix{ 1.f };
+	/*	alignas(16) glm::vec3 color{};*/
+		glm::mat4 normalMatrix{ 1.f };
 	};
 
-	SimpleRenderSystem::SimpleRenderSystem(LitDevice& device, VkRenderPass renderPass)
+	SimpleRenderSystem::SimpleRenderSystem(LitDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
 		: litDevice{ device }
 	{
-		CreatePipelineLayout();
+		CreatePipelineLayout(globalSetLayout);
 		CreatePipeline(renderPass);
 	}
 
@@ -31,17 +32,19 @@ namespace Lit
 		vkDestroyPipelineLayout(litDevice.GetDevice(), pipelineLayout, nullptr);
 	}
 
-	void SimpleRenderSystem::CreatePipelineLayout()
+	void SimpleRenderSystem::CreatePipelineLayout(VkDescriptorSetLayout globalSetLayout)
 	{
 		VkPushConstantRange pushConstantRange{};
 		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 		pushConstantRange.offset = 0;
 		pushConstantRange.size = sizeof(SimplePushConstantData);
 
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts{ globalSetLayout };
+
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = 0;
-		pipelineLayoutInfo.pSetLayouts = nullptr;
+		pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+		pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
 		pipelineLayoutInfo.pushConstantRangeCount = 1;
 		pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 		if (vkCreatePipelineLayout(litDevice.GetDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) !=
@@ -64,21 +67,35 @@ namespace Lit
 			pipelineConfig);
 	}
 
-	void SimpleRenderSystem::RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<LitGameObject>& gameObjects, const LitCamera& camera)
+	void SimpleRenderSystem::RenderGameObjects(FrameInfo& frameInfo, std::vector<LitGameObject>& gameObjects)
 	{
-		litPipeline->Bind(commandBuffer);
-		auto projectionView = camera.GetProjection() * camera.GetView();
+		litPipeline->Bind(frameInfo.commandBuffer);
+		auto projectionView = frameInfo.camera.GetProjection() * frameInfo.camera.GetView();
+
+		vkCmdBindDescriptorSets(
+			frameInfo.commandBuffer,
+			VK_PIPELINE_BIND_POINT_GRAPHICS,
+			pipelineLayout,
+			0,
+			1,
+			&frameInfo.globalDescriptorSet,
+			0,
+			nullptr);
+
 		for (auto& obj : gameObjects)
 		{
 			SimplePushConstantData push{};
 			/*obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.0001f, 2.0f * PI);
 			obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.0005f, 2.0f * PI);*/
-			push.transform = projectionView * obj.transform.mat4();
+			/*push.transform = projectionView * obj.transform.mat4();*/
 
-			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+			push.modelMatrix = obj.transform.mat4();
+			push.normalMatrix = obj.transform.normalMatrix();
+
+			vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 				0, sizeof(SimplePushConstantData), &push);
-			obj.model->Bind(commandBuffer);
-			obj.model->Draw(commandBuffer);
+			obj.model->Bind(frameInfo.commandBuffer);
+			obj.model->Draw(frameInfo.commandBuffer);
 		}
 	}
 

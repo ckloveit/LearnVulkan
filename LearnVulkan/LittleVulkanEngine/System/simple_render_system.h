@@ -3,6 +3,8 @@
 #include "Core/LitDevice.h"
 #include "Core/LitGameObject.h"
 #include "Core/LitPipeline.h"
+#include "Core/LitFrameInfo.h"
+
 
 // std
 #include <memory>
@@ -13,15 +15,15 @@ namespace Lit
 	class SimpleRenderSystem 
 	{
 	public:
-		SimpleRenderSystem(LitDevice& device, VkRenderPass renderPass);
+		SimpleRenderSystem(LitDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 		~SimpleRenderSystem();
 
 		SimpleRenderSystem(const SimpleRenderSystem&) = delete;
 		SimpleRenderSystem& operator=(const SimpleRenderSystem&) = delete;
 
-		void RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<LitGameObject>& gameObjects, const LitCamera& camera);
+		void RenderGameObjects(FrameInfo& frameInfo, std::vector<LitGameObject>& gameObjects);
 	private:																						  
-		void CreatePipelineLayout();
+		void CreatePipelineLayout(VkDescriptorSetLayout globalSetLayout);
 		void CreatePipeline(VkRenderPass renderPass);
 
 		LitDevice& litDevice;

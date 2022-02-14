@@ -44,6 +44,8 @@ namespace Lit
 		VkPhysicalDevice GetPhysicalDevice() { return physicalDevice; }
 		uint32_t GetGraphicsQueueFamily() { return FindPhysicalQueueFamilies().graphicsFamily; }
 
+		VkPhysicalDeviceProperties GetPhysicalDeviceProperties() { return physicalProperties; }
+
 		// Command Pool
 		VkCommandPool GetCommandPool() { return commandPool; }
 		SwapChainSupportDetails GetSwapChainSupportDetail() { return QuerySwapChainSupport(physicalDevice); }
@@ -110,6 +112,8 @@ namespace Lit
 		VkInstance instance;
 		VkDebugUtilsMessengerEXT debugMessenger;
 		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+		VkPhysicalDeviceProperties physicalProperties;
+
 		VkCommandPool commandPool;
 		LitWindow& window;
 	};

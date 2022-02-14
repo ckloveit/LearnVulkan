@@ -5,6 +5,7 @@
 #include "LitWindow.h"
 #include "LitGameObject.h"
 #include "LitRenderer.h"
+#include "LitDescriptors.h"
 
 namespace Lit
 {
@@ -40,6 +41,8 @@ namespace Lit
 		LitWindow window = { WIDTH, HEIGHT, "Hello Vulkan" };
 		LitDevice device = { window };
 		LitRenderer litRenderer { window, device };
+
+		std::unique_ptr<LitDescriptorPool> globalDescriptorPool{};
 		std::vector<LitGameObject> gameObjects;
 	};
 }

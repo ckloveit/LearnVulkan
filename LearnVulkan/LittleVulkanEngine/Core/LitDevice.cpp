@@ -542,10 +542,9 @@ namespace Lit
 		{
 			throw std::runtime_error("failed to find a suitable GPU!");
 		}
-		VkPhysicalDeviceProperties pProperties;
-		vkGetPhysicalDeviceProperties(physicalDevice, &pProperties);
+		vkGetPhysicalDeviceProperties(physicalDevice, &physicalProperties);
 
-		std::cout << "physical device: " << pProperties.deviceName << std::endl;
+		std::cout << "physical device: " << physicalProperties.deviceName << std::endl;
 	}
 
 	void LitDevice::CreateLogicalDevice()

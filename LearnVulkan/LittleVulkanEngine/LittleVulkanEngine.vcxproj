@@ -148,8 +148,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\LitApp.cpp" />
+    <ClCompile Include="Core\LitBuffer.cpp" />
     <ClCompile Include="Core\LitCamera.cpp" />
+    <ClCompile Include="Core\LitDescriptors.cpp" />
     <ClCompile Include="Core\LitDevice.cpp" />
+    <ClCompile Include="Core\LitGameObject.cpp" />
     <ClCompile Include="Core\LitModel.cpp" />
     <ClCompile Include="Core\LitPipeline.cpp" />
     <ClCompile Include="Core\LitRenderer.cpp" />
@@ -169,9 +172,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\LitApp.h" />
+    <ClInclude Include="Core\LitBuffer.h" />
     <ClInclude Include="Core\LitCamera.h" />
     <ClInclude Include="Core\LitComponent.h" />
+    <ClInclude Include="Core\LitDescriptors.h" />
     <ClInclude Include="Core\LitDevice.h" />
+    <ClInclude Include="Core\LitFrameInfo.h" />
     <ClInclude Include="Core\LitGameObject.h" />
     <ClInclude Include="Core\LitModel.h" />
     <ClInclude Include="Core\LitPipeline.h" />

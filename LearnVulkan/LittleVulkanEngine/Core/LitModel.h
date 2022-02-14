@@ -1,5 +1,6 @@
 #pragma once
 #include "LitDevice.h"
+#include "LitBuffer.h"
 
 //libs
 #define GLM_FORCE_RADIANS
@@ -37,7 +38,7 @@ namespace Lit
 		};
 
 		LitModel(LitDevice& device, const Builder& builder);
-		~LitModel() { CleanUp(); }
+		~LitModel();
 
 		LitModel(const LitModel&) = delete;
 		LitModel& operator=(const LitModel&) = delete;
@@ -51,18 +52,15 @@ namespace Lit
 	private:
 		void CreateVertexBuffer(const std::vector<Vertex>& vertices);
 		void createIndexBuffers(const std::vector<uint32_t>& indices);
-		void CleanUp();
 
 	private:
 		LitDevice& device;
 
-		VkBuffer vertexBuffer;
-		VkDeviceMemory vertexBufferMemory;
+		std::unique_ptr<LitBuffer> vertexBuffer;
 		uint32_t vertexCount;
 
 		bool hasIndexBuffer = false;
-		VkBuffer indexBuffer;
-		VkDeviceMemory indexBufferMemory;
+		std::unique_ptr<LitBuffer> indexBuffer;
 		uint32_t indexCount;
 
 	};

@@ -72,6 +72,15 @@
     <ClCompile Include="System\InputSystem.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Core\LitGameObject.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\LitDescriptors.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\LitBuffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\LitWindow.h">
@@ -141,6 +150,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Core\LitUtils.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\LitDescriptors.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\LitBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\LitFrameInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

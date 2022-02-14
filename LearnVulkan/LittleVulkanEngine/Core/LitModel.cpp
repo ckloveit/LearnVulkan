@@ -45,7 +45,7 @@ namespace Lit
 
 	std::vector<VkVertexInputAttributeDescription> LitModel::Vertex::GetVertexInputAttributeDesc()
 	{
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(2, VkVertexInputAttributeDescription{});
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(4, VkVertexInputAttributeDescription{});
 		attributeDescriptions[0].binding = 0;
 		attributeDescriptions[0].location = 0;
 		attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
@@ -56,6 +56,16 @@ namespace Lit
 		attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
 		attributeDescriptions[1].offset = offsetof(Vertex, color);
 
+		attributeDescriptions[2].binding = 0;
+		attributeDescriptions[2].location = 2;
+		attributeDescriptions[2].format = VK_FORMAT_R32G32B32_SFLOAT;
+		attributeDescriptions[2].offset = offsetof(Vertex, normal);
+
+		attributeDescriptions[3].binding = 0;
+		attributeDescriptions[3].location = 3;
+		attributeDescriptions[3].format = VK_FORMAT_R32G32_SFLOAT;
+		attributeDescriptions[3].offset = offsetof(Vertex, uv);
+
 		return attributeDescriptions;
 	}
 
@@ -65,7 +75,10 @@ namespace Lit
 		CreateVertexBuffer(builder.vertices);
 		createIndexBuffers(builder.indices);
 	}
+	LitModel::~LitModel()
+	{
 
+	}
 	std::unique_ptr<LitModel> LitModel::CreateModelFromFile(LitDevice& device, const std::string& filepath) 
 	{
 		Builder builder{};
@@ -76,30 +89,18 @@ namespace Lit
 	{
 		vertexCount = static_cast<uint32_t>(vertices.size());
 		assert(vertexCount >= 3 && "vertex count must be at least 3");
-		VkDeviceSize bufferSize = sizeof(Vertex) * vertexCount;
-
-		// using stage buffer
-		VkBuffer stagingBuffer;
-		VkDeviceMemory stagingBufferMemory;
-
-		device.CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-		void* data;
-		vkMapMemory(device.GetDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
-		memcpy(data, vertices.data(), (size_t)bufferSize);
-		vkUnmapMemory(device.GetDevice(), stagingBufferMemory);
-		// copy stage buffer to vertex buffer
-
-		device.CreateBuffer(
-			bufferSize,
+		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount;
+		VkDeviceSize vertexSize = sizeof(vertices[0]);
+		LitBuffer stagingBuffer(device, vertexSize, vertexCount, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		stagingBuffer.Map();
+		stagingBuffer.WriteToBuffer((void*)vertices.data());
+		vertexBuffer = std::make_unique<LitBuffer>(device, vertexSize, vertexCount,
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-			vertexBuffer,
-			vertexBufferMemory);
-		device.CopyBuffer(stagingBuffer, vertexBuffer, bufferSize);
-		vkDestroyBuffer(device.GetDevice(), stagingBuffer, nullptr);
-		vkFreeMemory(device.GetDevice(), stagingBufferMemory, nullptr);
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		device.CopyBuffer(stagingBuffer.GetBuffer(), vertexBuffer->GetBuffer(), bufferSize);
 	}
+
 	void LitModel::createIndexBuffers(const std::vector<uint32_t>& indices) 
 	{
 		indexCount = static_cast<uint32_t>(indices.size());
@@ -110,43 +111,16 @@ namespace Lit
 		}
 
 		VkDeviceSize bufferSize = sizeof(indices[0]) * indexCount;
-
-		VkBuffer stagingBuffer;
-		VkDeviceMemory stagingBufferMemory;
-		device.CreateBuffer(
-			bufferSize,
-			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			stagingBuffer,
-			stagingBufferMemory);
-
-		void* data;
-		vkMapMemory(device.GetDevice(), stagingBufferMemory, 0, bufferSize, 0, &data);
-		memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
-		vkUnmapMemory(device.GetDevice(), stagingBufferMemory);
-
-		device.CreateBuffer(
-			bufferSize,
-			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-			indexBuffer,
-			indexBufferMemory);
-
-		device.CopyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-		vkDestroyBuffer(device.GetDevice(), stagingBuffer, nullptr);
-		vkFreeMemory(device.GetDevice(), stagingBufferMemory, nullptr);
-	}
-
-	void LitModel::CleanUp()
-	{
-		vkDestroyBuffer(device.GetDevice(), vertexBuffer, nullptr);
-		vkFreeMemory(device.GetDevice(), vertexBufferMemory, nullptr);
-		if (hasIndexBuffer) 
-		{
-			vkDestroyBuffer(device.GetDevice(), indexBuffer, nullptr);
-			vkFreeMemory(device.GetDevice(), indexBufferMemory, nullptr);
-		}
+		VkDeviceSize indexSize = sizeof(indices[0]);
+		LitBuffer stagingBuffer(device, indexSize, indexCount,
+			VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		stagingBuffer.Map();
+		stagingBuffer.WriteToBuffer((void*)indices.data());
+		indexBuffer = std::make_unique<LitBuffer>(device, indexSize, indexCount,
+			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		device.CopyBuffer(stagingBuffer.GetBuffer(), indexBuffer->GetBuffer(), bufferSize);
 	}
 
 	void LitModel::Draw(VkCommandBuffer commandBuffer)
@@ -162,12 +136,12 @@ namespace Lit
 
 	void LitModel::Bind(VkCommandBuffer commandBuffer)
 	{
-		VkBuffer buffers[] = { vertexBuffer };
+		VkBuffer buffers[] = { vertexBuffer->GetBuffer() };
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
 		if (hasIndexBuffer) 
 		{
-			vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindIndexBuffer(commandBuffer, indexBuffer->GetBuffer(), 0, VK_INDEX_TYPE_UINT32);
 		}
 	}
 
@@ -197,17 +171,22 @@ namespace Lit
 						attrib.vertices[3 * index.vertex_index + 2],
 					};
 
-					auto colorIndex = 3 * index.vertex_index + 2;
-					if (colorIndex < attrib.colors.size()) {
-						vertex.color = glm::vec3{
-							attrib.colors[colorIndex - 2],
-							attrib.colors[colorIndex - 1],
-							attrib.colors[colorIndex - 0],
-						};
-					}
-					else {
-						vertex.color = glm::vec3{ 1.f, 1.f, 1.f };  // set default color
-					}
+					//auto colorIndex = 3 * index.vertex_index + 2;
+					//if (colorIndex < attrib.colors.size()) {
+					//	vertex.color = glm::vec3{
+					//		attrib.colors[colorIndex - 2],
+					//		attrib.colors[colorIndex - 1],
+					//		attrib.colors[colorIndex - 0],
+					//	};
+					//}
+					//else {
+					//	vertex.color = glm::vec3{ 1.f, 1.f, 1.f };  // set default color
+					//}
+					vertex.color = glm::vec3{
+					   attrib.colors[3 * index.vertex_index + 0],
+					   attrib.colors[3 * index.vertex_index + 1],
+					   attrib.colors[3 * index.vertex_index + 2],
+					};
 				}
 
 				if (index.normal_index >= 0) {
